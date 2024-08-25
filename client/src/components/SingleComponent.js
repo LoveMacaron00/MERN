@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import NavbarComponent from './NavbarComponent';
 import { useParams } from 'react-router-dom';
+import parse from 'html-react-parser';
 
 const SingleComponent = () => {
     const { slug } = useParams();
@@ -23,7 +24,7 @@ const SingleComponent = () => {
             {blog.title && (
               <>
                 <h1>{blog.title}</h1>
-                <p>{blog.content}</p>
+                <div className='pt-3'>{parse(blog.content)}</div>
                 <p className="text-muted"> ผู้เขียน : {blog.author} , เผยแพร์ : {new Date(blog.createdAt).toLocaleString()}</p>
               </>
             )}

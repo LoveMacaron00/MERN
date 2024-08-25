@@ -1,14 +1,31 @@
+import {Link,useNavigate} from "react-router-dom"
+import {getUser,logout} from "../services/authorize"
+
 const NavbarComponent=()=>{
     
+    const navigate = useNavigate();
+
     return(
         <nav>
             <ul className="nav nav-tabs">
                 <li className="nav-item pr-3 pt-3 pb-3">
-                    <a href="/" className="nav-link">หน้าแรก</a>
+                    <Link to="/" className="nav-link">หน้าแรก</Link>
                 </li>
-                <li className="nav-item pr-3 pt-3 pb-3">
-                    <a href="/create" className="nav-link">เขียนบทความ</a>
-                </li>
+                {!getUser() && (
+                    <li className="nav-item pr-3 pt-3 pb-3">
+                        <Link to="/login" className="nav-link">เข้าสู่ระบบ</Link>
+                    </li>
+                )}
+                {getUser() && (
+                    <li className="nav-item pr-3 pt-3 pb-3">
+                        <Link to="/create" className="nav-link">เขียนบทความ</Link>
+                    </li>
+                )}
+                {getUser() && (
+                    <li className="nav-item pr-3 pt-3 pb-3">
+                        <button className="nav-link" onClick={()=>logout(()=>navigate("/"))}>ออกจากระบบ</button>
+                    </li>
+                )}
             </ul>
         </nav>
     )

@@ -3,16 +3,25 @@ import NavbarComponent from "./NavbarComponent";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { getToken } from '../services/authorize';
 
 const EditComponent=()=> {
     const { slug } = useParams();
     const [state,setState] = useState({
         title:"",
-        content:"",
         author:"",
         slug:""
     })
-    const {title,content,author} = state
+    const {title,author} = state
+
+    const [content,setContent] = useState('')
+
+    const submitContent=(e)=> {
+        setContent(e)
+    }
+
     const navigate = useNavigate();
     
     const showUpdateForm = () => (
@@ -26,10 +35,13 @@ const EditComponent=()=> {
                 </div>
                 <div className="form-group">
                     <label>รายละเอียด</label>
-                    <textarea className="form-control" 
+                    <ReactQuill 
                         value={content}
-                        onChange={inputValue("content")}
-                    ></textarea>
+                        onChange={submitContent}
+                        theme="snow"
+                        className="pb-5 mb-3"
+                        style={{border: '1px solid #666'}}
+                    />
                 </div>
                 <div className="form-group">
                     <label>ผู้แต่ง</label>
@@ -49,7 +61,8 @@ const EditComponent=()=> {
         .get(`${process.env.REACT_APP_API}/blog/${slug}`)
         .then(response=>{
             const {title,content,author,slug} = response.data
-            setState({...state,title,content,author,slug})
+            setState({...state,title,author,slug})
+            setContent(content)
         })
         .catch(err => alert(err))
         // eslint-disable-next-line
@@ -65,7 +78,13 @@ const EditComponent=()=> {
      //console.table({title,content,author})
         console.log("API URL = ",process.env.REACT_APP_API)
         axios
-        .put(`${process.env.REACT_APP_API}/blog/${slug}`,{title,content,author})
+        .put(`${process.env.REACT_APP_API}/blog/${slug}`,{title,content,author},
+            {
+                headers: {
+                    authorization: `Bearer ${getToken()}`,
+                },
+            }
+        )
         .then(response=>{
             Swal.fire({
                 title: "แจ้งเตือน",
@@ -73,7 +92,8 @@ const EditComponent=()=> {
                 icon: "success"
             });
             const {title,content,author,slug} = response.data
-            setState({...state,title,author,content,slug})
+            setState({...state,title,author,slug})
+            setContent(content)
             navigate('/') // ใช้ navigate สำหรับการนำทาง
         })
         .catch(err=>{
